@@ -1,6 +1,7 @@
 var sprites = {
     ship: { sx: 0, sy: 0, w: 37, h: 42, frames: 1 },
     missile: { sx: 0, sy: 30, w: 2, h: 10, frames: 1 },
+    fireball: { sx: 0, sy: 75, w: 55, h: 43, frames: 1 },
     enemy_purple: { sx: 37, sy: 0, w: 42, h: 43, frames: 1 },
     enemy_bee: { sx: 79, sy: 0, w: 37, h: 43, frames: 1 },
     enemy_ship: { sx: 116, sy: 0, w: 42, h: 43, frames: 1 },
@@ -138,6 +139,14 @@ var PlayerShip = function() {
 
 	this.x += this.vx * dt;
 
+	if(Game.keys['b']){
+		Game.keys['b'] = false
+		this.board.add(new FireBall(this.x,this.y,0))
+	}
+	if(Game.keys['n']){
+		Game.keys['n'] = false
+		this.board.add(new FireBall(this.x,this.y,1))
+	}
 	if(this.x < 0) { this.x = 0; }
 	else if(this.x > Game.width - this.w) { 
 	    this.x = Game.width - this.w 
@@ -159,7 +168,6 @@ var PlayerShip = function() {
 	    tecla = Game.keys['fire']		//para no recargar
 	}
     }
-
     this.draw = function(ctx) {
 	SpriteSheet.draw(ctx,'ship',this.x,this.y,0);
     }
@@ -187,6 +195,42 @@ PlayerMissile.prototype.step = function(dt)  {
 PlayerMissile.prototype.draw = function(ctx)  {
     SpriteSheet.draw(ctx,'missile',this.x,this.y);
 };
+
+
+//////////////////FIREBALL////////////////////
+
+var FireBall= function(x,y,dir) {
+    this.w = SpriteSheet.map['fireball'].w;
+    this.h = SpriteSheet.map['fireball'].h;
+    this.x = x - this.w/2; 
+
+    this.y = y - this.h; 
+    this.vy = 100;
+    this.vx = -50
+    if (dir) {this.vx = this.vx * (-1)}
+    this.vuelta = true
+};
+
+FireBall.prototype.step = function(dt)  {
+    this.t += dt;
+    if (this.y>200 && this.vuelta){
+		this.vy = -100
+	}else{
+		this.vy = 100
+		this.vuelta = false
+	}
+	this.y += this.vy * dt;
+	this.x += this.vx * dt;
+	if(this.y < -this.h) { this.board.remove(this); }
+};
+
+FireBall.prototype.draw = function(ctx)  {
+   SpriteSheet.draw(ctx,'fireball',this.x,this.y);
+}
+
+///////////////////////////////////////////////////////
+
+
 
 
 
