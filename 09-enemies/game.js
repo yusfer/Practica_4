@@ -205,7 +205,7 @@ var FireBall= function(x,y,dir) {
     this.x = x - this.w/2; 
 
     this.y = y - this.h; 
-    this.vy = 100;
+    this.vy = -800;
     this.vx = -50
     if (dir) {this.vx = this.vx * (-1)}
     this.vuelta = true
@@ -213,15 +213,11 @@ var FireBall= function(x,y,dir) {
 
 FireBall.prototype.step = function(dt)  {
     this.t += dt;
-    if (this.y>200 && this.vuelta){
-		this.vy = -100
-	}else{
-		this.vy = 100
-		this.vuelta = false
-	}
-	this.y += this.vy * dt;
-	this.x += this.vx * dt;
-	if(this.y < -this.h) { this.board.remove(this); }
+    this.x += this.vx * dt;
+    this.y += this.vy*dt;
+    this.vy = this.vy+35;
+    
+    if(this.y < -this.h) {this.board.remove(this)}
 };
 
 FireBall.prototype.draw = function(ctx)  {
