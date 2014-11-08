@@ -1,6 +1,7 @@
 var sprites = {
     ship: { sx: 0, sy: 0, w: 37, h: 42, frames: 1 },
     missile: { sx: 0, sy: 30, w: 2, h: 10, frames: 1 },
+    fireball: { sx: 0, sy: 75, w: 55, h: 43, frames: 1 },
     enemy_purple: { sx: 37, sy: 0, w: 42, h: 43, frames: 1 },
     enemy_bee: { sx: 79, sy: 0, w: 37, h: 43, frames: 1 },
     enemy_ship: { sx: 116, sy: 0, w: 42, h: 43, frames: 1 },
@@ -20,7 +21,8 @@ var OBJECT_PLAYER        =  1,
 OBJECT_PLAYER_PROJECTILE =  2,
 OBJECT_ENEMY             =  4,
 OBJECT_ENEMY_PROJECTILE  =  8,
-OBJECT_POWERUP           = 16;
+OBJECT_POWERUP           = 16,
+OBJECT_FIREBALL           = 32;
 
 var startGame = function() {
     Game.setBoard(0,new Starfield(20,0.4,100,true))
@@ -134,6 +136,15 @@ var PlayerShip = function() {
 	else { this.vx = 0; }
 
 	this.x += this.vx * dt;
+	
+	if(Game.keys['b']){
+		Game.keys['b'] = false
+		this.board.add(new FireBall(this.x,this.y,0))
+	}
+	if(Game.keys['n']){
+		Game.keys['n'] = false
+		this.board.add(new FireBall(this.x,this.y,1))
+	}
 
 	if(this.x < 0) { this.x = 0; }
 	else if(this.x > Game.width - this.w) { 
@@ -183,6 +194,37 @@ PlayerMissile.prototype.step = function(dt)  {
     }
 };
 
+//////////////////FIREBALL////////////////////
+
+var FireBall = function(x,y,dir) {
+	if (dir){
+		this.setup('fireball',{ vy: -800 ,vx : -50});
+	}else{
+		this.setup('fireball',{ vy: -800 ,vx : 50});}
+
+    this.x = x - this.w/2; 
+    this.y = y - this.h; 
+    
+};
+
+FireBall.prototype = new Sprite();
+
+FireBall.prototype.step = function(dt)  {
+    this.t += dt;
+    this.x += this.vx * dt;
+    this.y += this.vy*dt;
+    this.vy = this.vy+35;
+    var collision = this.board.collide(this,OBJECT_ENEMY);
+    if(collision) {
+	collision.hit(Infinity);
+    } else if(this.y < -this.h) { 
+	this.board.remove(this); 
+    }
+    
+};
+FireBall.prototype.type = OBJECT_FIREBALL;
+
+///////////////////////////////////////////////////////
 
 
 
